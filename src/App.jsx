@@ -16,6 +16,7 @@ function App() {
   const [statusFilter, setStatusFilter] = useState('');
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
   const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   useEffect(() => {
     fetchApartments();
@@ -23,7 +24,16 @@ function App() {
 
   useEffect(() => {
     applyFiltersAndSort();
-  }, [apartments, statusFilter, neighborhoodFilter, sortBy]);
+  }, [apartments, statusFilter, neighborhoodFilter, sortBy, sortOrder]);
+
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder(field === 'price' ? 'asc' : 'desc');
+    }
+  };
 
   const fetchApartments = async () => {
     try {
@@ -48,13 +58,15 @@ function App() {
     }
 
     result.sort((a, b) => {
+      let comparison = 0;
       if (sortBy === 'price') {
-        return (a.price || 0) - (b.price || 0);
+        comparison = (a.price || 0) - (b.price || 0);
+      } else if (sortBy === 'surface') {
+        comparison = (a.surface || 0) - (b.surface || 0);
+      } else {
+        comparison = new Date(a.createdAt) - new Date(b.createdAt);
       }
-      if (sortBy === 'surface') {
-        return (b.surface || 0) - (a.surface || 0);
-      }
-      return new Date(b.createdAt) - new Date(a.createdAt);
+      return sortOrder === 'asc' ? comparison : -comparison;
     });
 
     setFilteredApartments(result);
@@ -133,7 +145,7 @@ function App() {
         <Filters 
           statusFilter={statusFilter} setStatusFilter={setStatusFilter}
           neighborhoodFilter={neighborhoodFilter} setNeighborhoodFilter={setNeighborhoodFilter}
-          sortBy={sortBy} setSortBy={setSortBy}
+          sortBy={sortBy} sortOrder={sortOrder} toggleSort={toggleSort}
           isSearchVisible={isSearchVisible}
         />
 

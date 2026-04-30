@@ -1,19 +1,18 @@
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, ArrowDown, ArrowUp } from 'lucide-react';
 
-const Filters = ({ 
-  statusFilter, setStatusFilter, 
-  neighborhoodFilter, setNeighborhoodFilter, 
-  sortBy, setSortBy,
+const Filters = ({
+  statusFilter, setStatusFilter,
+  neighborhoodFilter, setNeighborhoodFilter,
+  sortBy, sortOrder, toggleSort,
   isSearchVisible
 }) => {
   return (
     <div className="flex flex-col gap-4 mb-6">
-      
-      {/* Search */}
+
       {isSearchVisible && (
         <div className="bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-700 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300 flex flex-col sm:flex-row gap-4">
-          
-          {/* Neighborhood */}
+
+          {/* Search by neighborhood */}
           <div className="relative w-full sm:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-slate-400" />
@@ -27,7 +26,7 @@ const Filters = ({
             />
           </div>
 
-          {/* Status */}
+          {/* Status Filter */}
           <div className="w-full sm:w-48">
             <select
               value={statusFilter}
@@ -45,28 +44,31 @@ const Filters = ({
         </div>
       )}
 
-      {/* Sorting */}
+      {/* Sorting (Toujours visible, aligné à gauche en dehors du bandeau de recherche) */}
       <div className="flex justify-start items-center w-full">
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-400 font-medium">Trier par:</span>
           <div className="bg-slate-800/80 rounded-xl p-1 border border-slate-700 flex text-sm shadow-sm backdrop-blur-sm">
             <button
-              onClick={() => setSortBy('date')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${sortBy === 'date' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+              onClick={() => toggleSort('date')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 ${sortBy === 'date' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
             >
               Récent
+              {sortBy === 'date' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
             </button>
             <button
-              onClick={() => setSortBy('price')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${sortBy === 'price' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+              onClick={() => toggleSort('price')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 ${sortBy === 'price' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
             >
               Prix
+              {sortBy === 'price' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
             </button>
             <button
-              onClick={() => setSortBy('surface')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${sortBy === 'surface' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+              onClick={() => toggleSort('surface')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 ${sortBy === 'surface' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
             >
               Surface
+              {sortBy === 'surface' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
             </button>
           </div>
         </div>

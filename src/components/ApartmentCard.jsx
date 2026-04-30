@@ -18,8 +18,15 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
       {/* Card Header */}
       <div className="p-5 border-b border-slate-700/50 flex justify-between items-start">
         <div>
-          <div className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(apartment.status)} mb-3`}>
-            {apartment.status}
+          <div className="flex flex-col gap-2 mb-3">
+            <div className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(apartment.status)} w-fit`}>
+              {apartment.status}
+            </div>
+            {apartment.createdAt && (
+              <span className="text-xs text-slate-500">
+                Ajouté le {new Date(apartment.createdAt).toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
           </div>
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
             <Euro className="w-5 h-5 text-emerald-400" />
