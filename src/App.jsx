@@ -3,18 +3,19 @@ import { getApartments, deleteApartment, updateApartment, createApartment } from
 import ApartmentList from './components/ApartmentList';
 import ApartmentForm from './components/ApartmentForm';
 import Filters from './components/Filters';
-import { Home, Plus } from 'lucide-react';
+import { Home, Plus, Search } from 'lucide-react';
 
 function App() {
   const [apartments, setApartments] = useState([]);
   const [filteredApartments, setFilteredApartments] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [apartmentToEdit, setApartmentToEdit] = useState(null);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
   
-  // Filters state
+  // Filters
   const [statusFilter, setStatusFilter] = useState('');
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'price', 'surface'
+  const [sortBy, setSortBy] = useState('date');
 
   useEffect(() => {
     fetchApartments();
@@ -53,7 +54,6 @@ function App() {
       if (sortBy === 'surface') {
         return (b.surface || 0) - (a.surface || 0);
       }
-      // default: date (newest first)
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
@@ -108,13 +108,22 @@ function App() {
               SuiviLoc
             </h1>
           </div>
-          <button 
-            onClick={() => setIsFormOpen(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-blue-900/20"
-          >
-            <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">Nouvelle annonce</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              className={`p-2 rounded-lg transition-colors border ${isSearchVisible ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'}`}
+              title="Rechercher / Filtrer"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setIsFormOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 transition-colors text-white px-4 py-2 rounded-lg font-medium shadow-lg shadow-blue-900/20"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">Nouvelle annonce</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -125,6 +134,7 @@ function App() {
           statusFilter={statusFilter} setStatusFilter={setStatusFilter}
           neighborhoodFilter={neighborhoodFilter} setNeighborhoodFilter={setNeighborhoodFilter}
           sortBy={sortBy} setSortBy={setSortBy}
+          isSearchVisible={isSearchVisible}
         />
 
         <div className="mt-8">

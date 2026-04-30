@@ -39,8 +39,7 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Convert empty strings to undefined or keep them, depending on backend logic. 
-    // Here we let mongoose handle it, but we parse numbers.
+
     const cleanedData = { ...formData };
     if (cleanedData.price === '') delete cleanedData.price;
     if (cleanedData.rooms === '') delete cleanedData.rooms;

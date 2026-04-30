@@ -13,7 +13,7 @@ const getStatusColor = (status) => {
 
 const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
   return (
-    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">
+    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 flex flex-col h-full">
       
       {/* Card Header */}
       <div className="p-5 border-b border-slate-700/50 flex justify-between items-start">
@@ -27,7 +27,7 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
           </h3>
         </div>
         
-        {/* Actions (visible on hover) */}
+        {/* Actions */}
         <div className="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
             onClick={() => onEdit(apartment)}
@@ -47,7 +47,7 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
       </div>
 
       {/* Card Body */}
-      <div className="p-5 space-y-4">
+      <div className="p-5 space-y-4 flex-grow">
         
         <div className="flex items-center gap-6 text-slate-300">
           <div className="flex items-center gap-2" title="Nombre de pièces">
