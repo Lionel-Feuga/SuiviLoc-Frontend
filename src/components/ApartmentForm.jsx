@@ -14,6 +14,7 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
     contactNumber: '',
     url: '',
     imageUrl: '',
+    imageUrls: [],
     description: ''
   });
 
@@ -32,6 +33,7 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
         contactNumber: initialData.contactNumber || '',
         url: initialData.url || '',
         imageUrl: initialData.imageUrl || '',
+        imageUrls: initialData.imageUrls || (initialData.imageUrl ? [initialData.imageUrl] : []),
         description: initialData.description || ''
       });
     }
@@ -54,7 +56,8 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
         rooms: data.rooms || prev.rooms,
         surface: data.surface || prev.surface,
         neighborhood: data.neighborhood || prev.neighborhood,
-        contactName: data.contactName || prev.contactName
+        contactName: data.contactName || prev.contactName,
+        imageUrls: data.imageUrls && data.imageUrls.length > 0 ? data.imageUrls : prev.imageUrls
       }));
     } catch (error) {
       alert("Impossible de récupérer les infos de ce lien.");
@@ -70,6 +73,11 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
     if (cleanedData.price === '') delete cleanedData.price;
     if (cleanedData.rooms === '') delete cleanedData.rooms;
     if (cleanedData.surface === '') delete cleanedData.surface;
+    
+    // Assurer la rétrocompatibilité
+    if (cleanedData.imageUrls && cleanedData.imageUrls.length > 0) {
+      cleanedData.imageUrl = cleanedData.imageUrls[0];
+    }
     
     onSave(cleanedData);
   };
@@ -229,26 +237,54 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
 
           <div className="pt-4 border-t border-slate-700/50">
             <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" /> Image de l'appartement
+              <ImageIcon className="w-4 h-4" /> Photos de l'appartement ({formData.imageUrls?.length || 0})
             </label>
-            <input
-              type="url"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              placeholder="Lien de l'image (extrait automatiquement ou manuel)"
-              className="w-full px-4 py-3 mb-4 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-            {formData.imageUrl && (
-              <div className="relative w-full h-40 sm:h-48 rounded-xl overflow-hidden border border-slate-600 bg-slate-900">
-                <img src={formData.imageUrl} alt="Aperçu" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
-                <button 
-                  type="button" 
-                  onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
-                  className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 text-white rounded-full transition-colors backdrop-blur-sm"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            <div className="flex gap-2 mb-4">
+              <input
+                type="url"
+                id="newImageUrlInput"
+                placeholder="Ajouter manuellement un lien d'image..."
+                className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.target.value) {
+                      setFormData(prev => ({ ...prev, imageUrls: [...(prev.imageUrls || []), e.target.value] }));
+                      e.target.value = '';
+                    }
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.getElementById('newImageUrlInput');
+                  if (input && input.value) {
+                    setFormData(prev => ({ ...prev, imageUrls: [...(prev.imageUrls || []), input.value] }));
+                    input.value = '';
+                  }
+                }}
+                className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors font-medium"
+              >
+                Ajouter
+              </button>
+            </div>
+            
+            {/* Thumbnails */}
+            {formData.imageUrls && formData.imageUrls.length > 0 && (
+              <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
+                {formData.imageUrls.map((url, idx) => (
+                  <div key={idx} className="relative w-32 h-32 flex-shrink-0 rounded-xl overflow-hidden border border-slate-600 bg-slate-900 shadow-sm group">
+                    <img src={url} alt={`Aperçu ${idx+1}`} className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                    <button 
+                      type="button" 
+                      onClick={() => setFormData(prev => ({ ...prev, imageUrls: prev.imageUrls.filter((_, i) => i !== idx) }))}
+                      className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-red-500 text-white rounded-full transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>

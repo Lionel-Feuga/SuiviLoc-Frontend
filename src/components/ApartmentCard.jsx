@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building, MapPin, Euro, Maximize, Phone, User, ExternalLink, Pencil, Trash2, AlignLeft, Image as ImageIcon, X } from 'lucide-react';
+import { Building, MapPin, Euro, Maximize, Phone, User, ExternalLink, Pencil, Trash2, AlignLeft, Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -15,29 +15,55 @@ const getStatusColor = (status) => {
 
 const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const images = apartment.imageUrls && apartment.imageUrls.length > 0 
+                 ? apartment.imageUrls 
+                 : (apartment.imageUrl ? [apartment.imageUrl] : []);
+  const coverImage = images.length > 0 ? images[0] : null;
+
+  const openModal = () => {
+    setCurrentImageIndex(0);
+    setIsImageModalOpen(true);
+  };
+
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
 
   return (
     <>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 flex flex-col h-full">
         
         {/* Image Banner */}
-        {apartment.imageUrl && (
+        {coverImage && (
           <div 
             className="w-full h-48 bg-slate-900 relative flex-shrink-0 flex items-center justify-center border-b border-slate-700/50 cursor-pointer group/image overflow-hidden"
-            onClick={() => setIsImageModalOpen(true)}
+            onClick={openModal}
           >
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <ImageIcon className="w-10 h-10 text-slate-700 mb-2" />
               <span className="text-xs text-slate-600 font-medium">Image indisponible</span>
             </div>
             <img 
-              src={apartment.imageUrl} 
+              src={coverImage} 
               alt="Appartement" 
               className="w-full h-full object-cover relative z-10 transition-transform duration-500 group-hover/image:scale-110"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
             />
+            {images.length > 1 && (
+               <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-md z-20 flex items-center gap-1 backdrop-blur-sm">
+                 <ImageIcon className="w-3 h-3" /> +{images.length - 1}
+               </div>
+            )}
             {/* Overlay d'indication au survol */}
             <div className="absolute inset-0 bg-black/40 z-20 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
               <Maximize className="w-10 h-10 text-white drop-shadow-md" />
@@ -149,7 +175,7 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
       </div>
 
       {/* Image Modal (Fullscreen Lightbox) */}
-      {isImageModalOpen && apartment.imageUrl && (
+      {isImageModalOpen && images.length > 0 && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 sm:p-8 animate-in fade-in duration-200"
           onClick={() => setIsImageModalOpen(false)}
@@ -164,12 +190,38 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
           >
             <X className="w-6 h-6" />
           </button>
+          
+          {images.length > 1 && (
+            <button 
+              className="absolute left-2 sm:left-8 p-3 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full transition-colors z-[101] backdrop-blur-sm"
+              onClick={handlePrevImage}
+            >
+              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+          )}
+
           <img 
-            src={apartment.imageUrl} 
+            src={images[currentImageIndex]} 
+            key={currentImageIndex} // force re-render for animation
             alt="Appartement Plein écran" 
-            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl select-none"
+            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl select-none animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           />
+
+          {images.length > 1 && (
+            <button 
+              className="absolute right-2 sm:right-8 p-3 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full transition-colors z-[101] backdrop-blur-sm"
+              onClick={handleNextImage}
+            >
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            </button>
+          )}
+
+          {images.length > 1 && (
+             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 px-4 py-2 rounded-full text-white text-sm font-medium tracking-wide">
+               {currentImageIndex + 1} / {images.length}
+             </div>
+          )}
         </div>
       )}
 
