@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api/apartments',
+  // Utilise l'URL définie en variable d'environnement, sinon tombe sur localhost en dev
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/apartments',
 });
 
 export const getApartments = async () => {
