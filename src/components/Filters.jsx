@@ -35,6 +35,7 @@ const Filters = ({
             >
               <option value="">Tous les statuts</option>
               <option value="En attente">En attente</option>
+              <option value="À contacter">À contacter</option>
               <option value="Visite prévue">Visite prévue</option>
               <option value="Dossier déposé">Dossier déposé</option>
               <option value="Refusé">Refusé</option>

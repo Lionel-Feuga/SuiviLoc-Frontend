@@ -1,8 +1,9 @@
-import { Building, MapPin, Euro, Maximize, Phone, User, ExternalLink, Pencil, Trash2, AlignLeft } from 'lucide-react';
+import { Building, MapPin, Euro, Maximize, Phone, User, ExternalLink, Pencil, Trash2, AlignLeft, Image as ImageIcon } from 'lucide-react';
 
 const getStatusColor = (status) => {
   switch (status) {
     case 'En attente': return 'bg-slate-700 text-slate-300 border-slate-600';
+    case 'À contacter': return 'bg-orange-900/50 text-orange-300 border-orange-700/50';
     case 'Visite prévue': return 'bg-blue-900/50 text-blue-300 border-blue-700/50';
     case 'Dossier déposé': return 'bg-purple-900/50 text-purple-300 border-purple-700/50';
     case 'Accepté': return 'bg-emerald-900/50 text-emerald-300 border-emerald-700/50';
@@ -15,6 +16,24 @@ const ApartmentCard = ({ apartment, onEdit, onDelete }) => {
   return (
     <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300 flex flex-col h-full">
       
+      {/* Image Banner */}
+      {apartment.imageUrl && (
+        <div className="w-full h-48 bg-slate-900 relative flex-shrink-0 flex items-center justify-center border-b border-slate-700/50">
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <ImageIcon className="w-10 h-10 text-slate-700 mb-2" />
+            <span className="text-xs text-slate-600 font-medium">Image indisponible</span>
+          </div>
+          <img 
+            src={apartment.imageUrl} 
+            alt="Appartement" 
+            className="w-full h-full object-cover relative z-10"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+
       {/* Card Header */}
       <div className="p-5 border-b border-slate-700/50 flex justify-between items-start">
         <div>

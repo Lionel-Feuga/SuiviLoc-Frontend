@@ -24,4 +24,9 @@ export const deleteApartment = async (id) => {
   return response.data;
 };
 
+export const scrapeUrl = async (url) => {
+  const response = await api.post('/scrape', { url });
+  return response.data;
+};
+
 export default api;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Save } from 'lucide-react';
+import { X, Save, Wand2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { scrapeUrl } from '../services/api';
 
 const ApartmentForm = ({ initialData, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -12,8 +13,11 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
     contactName: '',
     contactNumber: '',
     url: '',
+    imageUrl: '',
     description: ''
   });
+
+  const [isScraping, setIsScraping] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -27,6 +31,7 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
         contactName: initialData.contactName || '',
         contactNumber: initialData.contactNumber || '',
         url: initialData.url || '',
+        imageUrl: initialData.imageUrl || '',
         description: initialData.description || ''
       });
     }
@@ -35,6 +40,27 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleScrape = async () => {
+    if (!formData.url) return;
+    setIsScraping(true);
+    try {
+      const data = await scrapeUrl(formData.url);
+      setFormData(prev => ({
+        ...prev,
+        imageUrl: data.imageUrl || prev.imageUrl,
+        price: data.price || prev.price,
+        rooms: data.rooms || prev.rooms,
+        surface: data.surface || prev.surface,
+        neighborhood: data.neighborhood || prev.neighborhood,
+        contactName: data.contactName || prev.contactName
+      }));
+    } catch (error) {
+      alert("Impossible de récupérer les infos de ce lien.");
+    } finally {
+      setIsScraping(false);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -75,6 +101,7 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
               className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               <option value="En attente">En attente</option>
+              <option value="À contacter">À contacter</option>
               <option value="Visite prévue">Visite prévue</option>
               <option value="Dossier déposé">Dossier déposé</option>
               <option value="Refusé">Refusé</option>
@@ -178,14 +205,52 @@ const ApartmentForm = ({ initialData, onSave, onCancel }) => {
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Lien de l'annonce (URL)</label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                name="url"
+                value={formData.url}
+                onChange={handleChange}
+                placeholder="ex: https://www.leboncoin.fr/..."
+                className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              <button
+                type="button"
+                onClick={handleScrape}
+                disabled={!formData.url || isScraping}
+                className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-xl transition-colors flex items-center gap-2 font-medium"
+                title="Extraire les informations depuis l'URL"
+              >
+                {isScraping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Wand2 className="w-5 h-5" />}
+                <span className="hidden sm:inline">Extraire</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-700/50">
+            <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" /> Image de l'appartement
+            </label>
             <input
               type="url"
-              name="url"
-              value={formData.url}
+              name="imageUrl"
+              value={formData.imageUrl}
               onChange={handleChange}
-              placeholder="ex: https://www.leboncoin.fr/..."
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Lien de l'image (extrait automatiquement ou manuel)"
+              className="w-full px-4 py-3 mb-4 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
+            {formData.imageUrl && (
+              <div className="relative w-full h-40 sm:h-48 rounded-xl overflow-hidden border border-slate-600 bg-slate-900">
+                <img src={formData.imageUrl} alt="Aperçu" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                <button 
+                  type="button" 
+                  onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                  className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 text-white rounded-full transition-colors backdrop-blur-sm"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
