@@ -13,6 +13,10 @@ RUN yarn install
 # Copie du code source
 COPY . .
 
+# Variables d'environnement pour le build
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build de l'application
 RUN yarn build
 
